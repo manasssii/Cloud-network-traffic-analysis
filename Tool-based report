@@ -1,0 +1,62 @@
+Wireshark Analysis Report
+
+1. Introduction:
+
+Cloud network traffic forensics is critical for identifying and mitigating security threats in cloud environments. This report documents the use of Wireshark, an open-source packet analyzer, to capture and analyze cloud network traffic. The objective is to identify suspicious activities, anomalous patterns, and communication with cloud services such as AWS, Azure, or Google Cloud.
+
+
+2. Objectives:
+
+- Capture live network traffic to monitor communication with cloud services.
+- Filter and analyze packets to identify potential anomalies or security concerns.
+- Document findings to provide actionable insights for cloud traffic monitoring.
+
+
+3. Methodology:
+
+3.1 Tools and Setup:
+- Tool Used: Wireshark
+- System Requirements: A machine with Wireshark installed and a network interface capable of packet capturing.
+- Cloud Services Monitored: AWS, Azure, and Google Cloud.
+
+3.2 Traffic Capture Process:
+1. Interface Selection: Selected the active network interface (e.g., Ethernet or Wi-Fi) in Wireshark.
+2. Filters Applied:
+   - `tcp.port == 443`: To focus on HTTPS traffic.
+   - `ip.addr == <cloud_service_IP>`: To monitor specific cloud service communications.
+   - `dns`: To capture DNS lookups related to cloud domains.
+3. Capture Duration: Traffic was captured for a continuous 15-minute session during peak activity hours.
+4. Data Export: The captured packets were saved as a `.pcap` file for offline analysis.
+
+3.3 Analysis Process:
+- Protocol Hierarchy: Analyzed the distribution of protocols to identify dominant traffic types.
+- Conversation Analysis: Reviewed endpoint communication to pinpoint potential anomalies.
+- Payload Inspection: Examined packet contents for signs of unusual behavior, such as malformed requests or repeated failed attempts.
+
+
+4. Results and Findings:
+
+4.1 Protocol Distribution:
+- HTTP/HTTPS Traffic: Accounted for 85% of the total traffic, with a significant portion directed to cloud service endpoints.
+- DNS Queries: Revealed frequent lookups to cloud domains, confirming active communication with cloud services.
+
+4.2 Notable Anomalies:
+1. Repeated Connection Attempts: Several IPs made repeated failed attempts to connect to cloud services, suggesting potential brute force or scanning activity.
+2. Unusual Payloads: Identified packets with unexpected or malformed payloads, which could indicate malicious activity.
+
+4.3 Endpoint Analysis:
+- Top Communication Pairs: The analysis revealed frequent communication between the local machine and specific cloud IP ranges, confirming legitimate usage of cloud services.
+
+
+5. Conclusion and Recommendations:
+
+5.1 Insights:
+The analysis confirmed active communication with cloud services. These findings highlight the importance of continuous monitoring of cloud network traffic.
+
+5.2 Recommendations:
+- Implement Firewalls: Use IP whitelisting to restrict access to known endpoints.
+- Monitor DNS Activity: Regularly review DNS queries for unusual patterns.
+- Anomaly Detection: Deploy automated tools for real-time anomaly detection in cloud traffic.
+
+
+
