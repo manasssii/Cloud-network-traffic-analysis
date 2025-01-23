@@ -1,0 +1,84 @@
+import pyshark
+
+# Function to capture live traffic
+def capture_traffic(interface='eth0', duration=60):
+    """
+    Captures live network traffic on the specified interface for a given duration.
+
+    Parameters:
+    - interface (str): The network interface to capture packets from.
+    - duration (int): Duration of packet capture in seconds.
+
+    Returns:
+    - capture (pyshark.LiveCapture): Captured packets.
+    """
+    print(f"Capturing traffic on {interface} for {duration} seconds...")
+    capture = pyshark.LiveCapture(interface=interface)
+    capture.sniff(timeout=duration)
+    return capture
+
+# Function to analyze captured traffic
+def analyze_traffic(capture):
+    """
+    Analyzes the captured packets for cloud-specific traffic and anomalies.
+
+    Parameters:
+    - capture (pyshark.LiveCapture): Captured packets.
+    """
+    # Define cloud-related IP ranges and ports (example ranges for AWS)
+    cloud_ips = ['3.5.140.0/22', '52.95.110.0/23']
+    cloud_ports = [443, 80]  # Common cloud service ports (HTTPS and HTTP)
+
+    print("Analyzing captured traffic...")
+    for packet in capture:
+        try:
+            # Analyze IP packets
+            if 'IP' in packet:
+                src_ip = packet.ip.src
+                dst_ip = packet.ip.dst
+                if any(ip in src_ip or ip in dst_ip for ip in cloud_ips):
+                    print(f"Cloud traffic detected: {src_ip} -> {dst_ip}")
+
+            # Analyze TCP packets
+            if 'TCP' in packet:
+                port = int(packet.tcp.port)
+                if port in cloud_ports:
+                    print(f"TCP traffic on port {port}: {packet}")
+
+        except AttributeError:
+            # Skip packets without required attributes
+            pass
+
+# Function to save analysis results to a log file
+def save_to_log(capture, log_file='traffic_log.txt'):
+    """
+    Saves captured traffic details to a log file.
+
+    Parameters:
+    - capture (pyshark.LiveCapture): Captured packets.
+    - log_file (str): File name to save the logs.
+    """
+    with open(log_file, 'w') as log:
+        log.write("Cloud Network Traffic Analysis Log\n")
+        log.write("=" * 50 + "\n")
+
+        for packet in capture:
+            try:
+                if 'IP' in packet:
+                    log.write(f"Packet: {packet}\n")
+            except AttributeError:
+                pass
+
+    print(f"Traffic analysis saved to {log_file}")
+
+# Main function
+if __name__ == "__main__":
+    interface = input("Enter the network interface (e.g., eth0, wlan0): ")
+    duration = int(input("Enter capture duration in seconds: "))
+
+    # Capture and analyze traffic
+    captured_packets = capture_traffic(interface, duration)
+    analyze_traffic(captured_packets)
+
+    # Save analysis to log file
+    save_to_log(captured_packets)
